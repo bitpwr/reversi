@@ -5,37 +5,69 @@
 
 int main(int, char**)
 {
-    std::cout << "Welcome, you are " << white << std::endl;
+    std::cout << "Welcome, you are " << reversi::white << std::endl;
 
-    auto board = createBoard();
-    print(board);
+    auto board = reversi::createBoard();
+    reversi::print(board);
 
-    size_t x{};
-    size_t y{};
+    const auto read_coord = []() -> std::optional<reversi::Position> {
+        reversi::Position pos;
+        std::string input;
+        std::cout << "Enter positions for " << reversi::white << std::endl;
+        std::cin >> input;
+        if (std::isdigit(input.front())) {
+            pos.x = std::stoi(input);
+        } else {
+            return std::nullopt;
+        }
+        std::cin >> input;
+        if (std::isdigit(input.front())) {
+            pos.y = std::stoi(input);
+        } else {
+            return std::nullopt;
+        }
+        return pos;
+    };
 
+    reversi::Position pos;
     for (;;) {
-        std::cout << "Enter positions for " << white << std::endl;
-        std::cin >> x;
-        std::cin >> y;
-        --x;
-        --y;
-        auto tiles = flippedTiles(board, x, y, white);
+        auto tiles = std::vector<reversi::Position>{};
 
-        if (!tiles.empty()) {
-            setTiles(board, tiles, white);
+        while (tiles.empty()) {
+            const auto coord = read_coord();
+            if (coord) {
+                pos = coord.value();
+            } else {
+                std::cout << "Good bye" << std::endl;
+                return EXIT_SUCCESS;
+            }
+
+            --pos.x;
+            --pos.y;
+            tiles = reversi::flippedTiles(board, pos, reversi::white);
+
+            if (!tiles.empty()) {
+                setTiles(board, tiles, reversi::white);
+            } else {
+                std::cout << "Bad move" << std::endl;
+            }
         }
-        print(board);
+        reversi::print(board);
 
-        std::cout << "Enter positions for " << black << std::endl;
-        std::cin >> x;
-        std::cin >> y;
-        --x;
-        --y;
-        tiles = flippedTiles(board, x, y, black);
+        auto const move = reversi::bestMove(board, reversi::black);
+        if (move) {
+            std::cout << "Computer move " << move->x + 1 << ',' << move->y + 1
+                      << std::endl;
 
-        if (!tiles.empty()) {
-            setTiles(board, tiles, black);
+            tiles = reversi::flippedTiles(board, *move, reversi::black);
+
+            if (!tiles.empty()) {
+                setTiles(board, tiles, reversi::black);
+            }
+        } else {
+            std::cout << "NO MOVE" << std::endl;
         }
-        print(board);
+
+        reversi::print(board);
     }
 }
