@@ -6,38 +6,26 @@ on:
   workflow_dispatch:
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   BUILD_FOLDER: build
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Configure CMake
+    - name: Configure
       run: |
-        gcc --version
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install -y gcc-10
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 90 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
-        echo gcc version after
-        gcc --version
-        cmake --version
-        python --version
         pip install conan
-        # conan profile list
-        # conan profile update settings.compiler.libcxx=libstdc++11 default
         mkdir ${{env.BUILD_FOLDER}}
         cd ${{env.BUILD_FOLDER}}
-        conan install ..
+        conan install -s compiler.libcxx=libstdc++11 ..
         cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MODULE_PATH=${PWD} ..
 
     - name: Build
