@@ -32,12 +32,10 @@ auto onBoard(size_t index) -> bool
     return index < (boardSize * boardSize);
 }
 
+// TODO: Remove
 auto tileAt(Board const& board, size_t x, size_t y) -> std::optional<Tile>
 {
-    if (onBoard(x, y)) {
-        return board[index({ x, y })];
-    }
-    return std::nullopt;
+    return tileAt(board, { x, y });
 }
 
 auto free(Board const& board, size_t x, size_t y) -> bool
@@ -65,6 +63,10 @@ auto boardScore(Board const& board, Tile tile) -> double
     return tileCount(board, tile) * 1.5 - tileCount(board, otherTile(tile));
 }
 
+}
+
+namespace reversi {
+
 Board createBoard()
 {
     auto board = Board{};
@@ -79,6 +81,14 @@ Board createBoard()
     setTile(board, { 4, 4 }, black);
 
     return board;
+}
+
+auto tileAt(Board const& board, const Position pos) -> std::optional<Tile>
+{
+    if (onBoard(pos.x, pos.y)) {
+        return board[index(pos)];
+    }
+    return std::nullopt;
 }
 
 auto setTile(Board& board, const Position pos, Tile tile) -> void

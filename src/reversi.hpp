@@ -20,6 +20,8 @@ struct Position
 };
 
 auto createBoard() -> Board;
+auto tileAt(Board const& board, const Position pos) -> std::optional<Tile>;
+
 auto setTile(Board& board, const Position pos, Tile tile) -> void;
 auto setTiles(Board& board, std::vector<Position> const& positions, Tile tile)
   -> void;
