@@ -11,15 +11,16 @@ macro(setup_test name)
     set_target_properties(${exec}
         PROPERTIES
             CXX_STANDARD 20
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test
+    )
     target_include_directories(${exec}
         PRIVATE
             ${Catch2_INCLUDE_DIR}
-            ${CMAKE_SOURCE_DIR}/src)
+    )
+    target_link_libraries(${exec} reversi)
     add_test(NAME ${exec} COMMAND ${exec})
 endmacro()
 
 setup_test(board
     board/test_board.cpp
-    ${CMAKE_SOURCE_DIR}/src/reversi.cpp
 )
