@@ -7,6 +7,17 @@
 
 namespace reversi {
 
+struct Offset
+{
+    int x;
+    int y;
+};
+
+Offset operator-(Offset const offset)
+{
+    return { -offset.x, -offset.y };
+}
+
 auto index(Position const& pos) -> size_t
 {
     return pos.y * boardSize + pos.x;
@@ -30,6 +41,15 @@ auto onBoard(size_t x, size_t y) -> bool
 auto onBoard(size_t index) -> bool
 {
     return index < (boardSize * boardSize);
+}
+
+auto move(Position const pos, Offset const offset) -> std::optional<Position>
+{
+    Position p{ pos.x + offset.x, pos.y + offset.y };
+    if (onBoard(p.x, p.y)) {
+        return p;
+    }
+    return {};
 }
 
 // TODO: Remove
@@ -108,7 +128,7 @@ auto flippedTiles(Board const& board, Position const pos, Tile const tile)
   -> std::vector<Position>
 {
     std::vector<Position> tiles;
-    std::vector<std::pair<int, int>> directions = { { 1, 0 },  { 1, 1 },
+    static const std::vector<Offset> directions = { { 1, 0 },  { 1, 1 },
                                                     { 0, 1 },  { -1, 1 },
                                                     { -1, 0 }, { -1, -1 },
                                                     { 0, -1 }, { 1, -1 } };
@@ -117,23 +137,18 @@ auto flippedTiles(Board const& board, Position const pos, Tile const tile)
 
     if (free(board, pos.x, pos.y)) {
         for (auto const& direction : directions) {
-            auto testX = pos.x + direction.first;
-            auto testY = pos.y + direction.second;
+            auto testPos = move(pos, direction);
 
-            if (onBoard(testX, testY) &&
-                tileAt(board, testX, testY) == opponentTile) {
-                while (tileAt(board, testX, testY) == opponentTile) {
-                    testX += direction.first;
-                    testY += direction.second;
+            if (testPos && tileAt(board, *testPos) == opponentTile) {
+                while (testPos && tileAt(board, *testPos) == opponentTile) {
+                    testPos = move(*testPos, direction);
                 }
 
-                if (tileAt(board, testX, testY) == tile) {
-                    testX -= direction.first;
-                    testY -= direction.second;
-                    while (tileAt(board, testX, testY) == opponentTile) {
-                        tiles.emplace_back(testX, testY);
-                        testX -= direction.first;
-                        testY -= direction.second;
+                if (testPos && tileAt(board, *testPos) == tile) {
+                    testPos = move(*testPos, -direction);
+                    while (testPos && tileAt(board, *testPos) == opponentTile) {
+                        tiles.push_back(*testPos);
+                        testPos = move(*testPos, -direction);
                     }
                 }
             }
