@@ -9,11 +9,7 @@ include(GNUInstallDirs)
 option(BUILD_SHARED_LIBS "Defines if the reversi library should be shared or static" OFF)
 
 add_subdirectory(lib)
-
-set(APP_NAME reversi-cli)
-add_executable(${APP_NAME} src/main.cpp)
-target_link_libraries(${APP_NAME} reversi)
-set_target_properties(${APP_NAME} PROPERTIES CXX_STANDARD 20)
+add_subdirectory(cli)
 
 enable_testing()
 add_subdirectory(test)
@@ -21,5 +17,3 @@ add_subdirectory(test)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
-
-install(TARGETS ${APP_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} )
