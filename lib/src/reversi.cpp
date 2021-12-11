@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
-#include <ranges>
+#include <range/v3/algorithm.hpp>
+#include <range/v3/view.hpp>
+
 
 namespace reversi {
 
@@ -30,7 +32,7 @@ auto position(size_t index) -> Position
 
 auto tileCount(Board const& board, Tile tile) -> size_t
 {
-    return std::ranges::count_if(board, [tile](auto t) { return t == tile; });
+    return ranges::count_if(board, [tile](auto t) { return t == tile; });
 }
 
 auto onBoard(size_t x, size_t y) -> bool
@@ -175,7 +177,7 @@ auto bestMove(Board const& board, Tile tile) -> std::optional<Position>
     std::vector<std::tuple<Position, double>> moves;
 
     for (auto index :
-         std::views::iota(1) | std::views::take(boardSize * boardSize)) {
+         ranges::views::iota(1) | ranges::views::take(boardSize * boardSize)) {
         if (free(board, index)) {
             auto const flipped = flippedTiles(board, position(index), tile);
             if (!flipped.empty()) {
@@ -188,7 +190,7 @@ auto bestMove(Board const& board, Tile tile) -> std::optional<Position>
 
     if (!moves.empty()) {
         auto const maxIt =
-          std::ranges::max_element(moves, [](auto const& m1, auto const& m2) {
+          ranges::max_element(moves, [](auto const& m1, auto const& m2) {
               return std::get<1>(m1) < std::get<1>(m2);
           });
         if (maxIt != moves.end()) {
@@ -200,7 +202,7 @@ auto bestMove(Board const& board, Tile tile) -> std::optional<Position>
 
 void print(Board& board)
 {
-    constexpr auto numbers = std::views::iota(1) | std::views::take(boardSize);
+    auto const numbers = ranges::views::iota(1) | ranges::views::take(boardSize);
 
     std::cout << "  ";
     for (auto i : numbers) {
