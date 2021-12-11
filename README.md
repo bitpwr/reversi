@@ -6,9 +6,20 @@ A simple reversi game, used to practice:
 
 * C++20
 * Conan
-* GitHub actions
 * Catch 2 unit testing
 
+## Build
+
+```
+mkdir build
+cd build
+conan install ..
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MODULE_PATH=. ..
+```
+
+## Later
+
+* GitHub actions
 * VS Code dev containers
 * VS Code debugging
 * GUI - SDL,???
